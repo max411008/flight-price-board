@@ -1,12 +1,12 @@
 {
  "manifest_version":3,
  "name":"航價簿・免費更新助手",
- "version":"1.0.0",
+ "version":"2.0.0",
  "description":"在你要求更新時，依序讀取所選 Google Flights 航班的公開票價與歷史圖表，回傳至你的航價簿。",
- "background":{"service_worker":"background.js"},
+ "background":{"service_worker":"background.js","type":"module"},
  "host_permissions":["https://www.google.com/travel/flights/*"],
  "content_scripts":[
-  {"matches":["https://flight-fare-notebook.max411008.chatgpt.site/*","http://127.0.0.1:5173/*"],"js":["bridge.js"]},
+  {"matches":["https://max411008.github.io/flight-price-board/*","http://127.0.0.1:5174/*"],"js":["bridge.js"]},
   {"matches":["https://www.google.com/travel/flights/*"],"js":["parser.js","google.js"]}
  ]
 }

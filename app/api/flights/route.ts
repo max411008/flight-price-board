@@ -1,6 +1,0 @@
-import {get,list,put,sameOrigin,unavailable} from '@/lib/fares';
-import {flightUrl} from '@/lib/flight-url';
-import {z} from 'zod';
-const input=z.object({flight:z.string().trim().toUpperCase().regex(/^[A-Z0-9]{2}\d{1,4}[A-Z]?$/),departure:z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine(v=>!Number.isNaN(Date.parse(v))&&new Date(v).toISOString().slice(0,10)===v),origin:z.string().regex(/^[A-Z]{3}$/),destination:z.string().regex(/^[A-Z]{3}$/)}).refine(f=>f.origin!==f.destination);
-export async function GET(){try{return Response.json(await list(),{headers:{'Cache-Control':'no-store'}})}catch(e){return unavailable(e)}}
-export async function POST(r:Request){if(!sameOrigin(r))return new Response(null,{status:403});let f;try{f=input.parse(await r.json())}catch{return Response.json({error:'請輸入有效航班、日期及不同的三碼機場代碼。'},{status:400})}try{await list();const existing=(await list()).find(x=>x.flight===f.flight&&x.departure===f.departure&&x.origin===f.origin&&x.destination===f.destination);const id=existing?.id||[f.flight,f.departure,f.origin,f.destination].join('_');const previous=await get(id);return Response.json(await put(previous||{...f,id,current:null,history:[],sourceUrl:flightUrl(f),observedAt:'',status:'pending'}))}catch(e){return unavailable(e)}}

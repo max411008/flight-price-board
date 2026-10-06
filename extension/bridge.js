@@ -6,8 +6,8 @@
  port.onDisconnect.addListener(()=>{clearInterval(timer);send({type:'disconnected'})});
  window.addEventListener('message',event=>{
   if(event.source!==window||event.origin!==location.origin||event.data?.source!=='fare-board')return;
-  if(event.data.type==='ping')send({type:'ready'});
+  if(event.data.type==='ping')port.postMessage({type:'ping'});
   if(event.data.type==='refresh'&&Array.isArray(event.data.jobs))port.postMessage({type:'refresh',jobs:event.data.jobs});
  });
- send({type:'ready'});
+ port.postMessage({type:'ping'});
 })();

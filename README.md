@@ -1,72 +1,46 @@
-# 航價簿 Flight Price Board
+# 航價簿 · GitHub Pages
 
-整合多筆「航班編號＋起飛日期」的歷史票價與最近報價，附免費 Chrome／Edge 更新助手。
+完全免費的靜態航班價格看板。沒有伺服器、付費 API、帳號或資料庫。
 
-**網站：** https://flight-fare-notebook.max411008.chatgpt.site/
+## 網站發布
+
+本 repo 的 `docs/` 已包含建置完成的網站與更新助手。第一次請進入 [Settings → Pages](https://github.com/max411008/flight-price-board/settings/pages)，選擇 **Deploy from a branch → main → /docs → Save**。
+
+GitHub 完成部署後，網址為 https://max411008.github.io/flight-price-board/ 。上述網址只有在 Pages 設定啟用、部署成功後才會生效。
 
 ## 功能
 
-- 去回總價表：自選去回航班，依相同觀察日合計；缺任一段當日價格時不造總價。
+- 任意航班編號、起飛日、IATA 機場代碼；可同時加入去回兩段。
+- 成人數、孩童數、每位孩童起飛時歲數；未滿 2 歲可選占位／不占位。
+- 人數和年齡分開保存，查詢真實多人總價，不用成人單價乘人數。
+- 相同旅伴的去回總價、同日歷史最低、走勢圖、每日去回對照表。
+- 顯示來源已有的歷史；Google 未提供時會明確顯示沒有資料。
+- 本機儲存、JSON 備份匯出與匯入。相同查詢匯入時保留較新報價。
 
-- 新增不同航空公司、航線、日期的查詢並保存清單。
-- 比較最近查到的價格、已取得歷史中的最低／最高價，以及價格曲線。
-- Google Flights 有提供時，可直接讀取既有的每日歷史，不必從安裝日開始累積。
-- 更新失敗保留舊資料，並標示來源錯誤及原查詢時間。
-- 助手連線且網頁開啟時每小時更新，也支援手動批次更新。
-- 清單與價格保存於網站的 Cloudflare D1 資料庫。
+## 免費更新助手
 
-初始資料為 2026/10/23 JX201（TPE → MFM）及 2026/10/27 JX206（MFM → TPE），各 61 天歷史。資料是 2026/10/06 實際查詢快照，不代表現在的即時報價。
+下載網站中的 `fare-bridge.zip`，解壓縮。在 Chrome `chrome://extensions` 或 Edge `edge://extensions` 開啟「開發人員模式」，選「載入未封裝項目」，選取包含 `manifest.json` 的資料夾。回到 **同一個瀏覽器** 的 GitHub Pages 網站重新整理，按「更新全部」。v1 使用者請先移除舊版再載入 v2。
 
-## 安裝免費更新助手
+只會讀取自行開啟的 Google Flights 公開頁面。助手依序查詢、驗證航班／日期／機場／乘客條件及新台幣價格。遇到 CAPTCHA 停止，請自行在 Google 頁面完成驗證。瀏覽器不允許網站自動安裝擴充套件，初次安裝需要使用者完成。
 
-1. 從網站「設定免費更新助手」下載 ZIP，或下載本專案的 `public/fare-bridge.zip`。
-2. 解壓縮至固定資料夾。
-3. Chrome 開啟 `chrome://extensions`；Edge 開啟 `edge://extensions`。
-4. 開啟「開發人員模式」，選「載入未封裝項目」，選取包含 `manifest.json` 的資料夾。
-5. 用同一瀏覽器開啟網站並重新整理，確認頁首顯示「免費更新助手已連線」。
+Google 依年齡區間查詢：2–11 歲兒童，12 歲以上成人類別；0–1 歲分占位與不占位嬰兒。保留每位孩童歲數，但不代表 Google 接受逐歲報價；最終票價依航空公司。若去回途中生日導致歲數不同，可分別新增單程查詢（不自動合併不同歲數的紀錄）。
 
-也可直接將此專案的 `extension/` 資料夾載入。助手僅讀取指定的 Google Flights 航班頁面；不訂票、不付款、不使用付費票價 API。需要瀏覽器與網站保持開啟；Codex 內嵌瀏覽器不能安裝 Chrome 擴充套件。
+**限制**：並非所有航班或乘客组合都有歷史圖表。Google DOM 或查詢格式改變時助手可能需要更新。去回合計是兩張單程票相加，並非同一張來回套票；兩段最近報價可能不是同一時間。圖表的每一個點只合併同日、同乘客條件的來源歷史，缺失價格不補零、不內插。不占位嬰兒最多每名成人一位，總乘客最多九人。
 
-Google 要求人類驗證時，助手停止後續查詢；請自行在 Google Flights 處理後再更新。Google 頁面結構改變時可能需要調整解析器。
+網站必須開著、助手連線，才能手動更新或每小時更新；GitHub Pages 不在雲端持續抓票價。資料存於此瀏覽器的 localStorage，清除網站資料會移除清單。請先匯出備份再換裝置。
 
-## 價格的意義
+## 初始資料來源
 
-條件固定為單程、一位成人、經濟艙、新臺幣，使用 Google Flights 顯示的各通路最低售價。歷史涵蓋期間取決於 Google 實際提供的記錄，不保證所有航班或所有日期都有資料。航空公司官網價、不同通路票種、行李、匯率可能不同。兩段單程相加不等於來回票售價。
+`seed.json` 是 2026-10-06 從 Google Flights 公開頁面取得的 JX201（10/23 TPE→MFM）、JX206（10/27 MFM→TPE）**一位成人經濟艙**報價，以及來源當時顯示的 61 天價格記錄，並非即時售價或隨機範例。使用者新增的查詢不會套用這些價格。
 
-## 本機啟動
+## 開發
 
-需要 Node.js 22.13 以上、npm。
+需要 Node.js 22+；**不需要 npm install，沒有套件依賴**。
 
-```bash
-npm ci
-npm run build
-node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0000_high_malice.sql
-npm run dev
+```sh
+node --test tests/*.test.mjs
+node scripts/build.mjs
+node scripts/serve.mjs
 ```
 
-開啟 http://127.0.0.1:5173/ 。資料庫初始化指令只在第一次執行；不要重複套用已執行的 migration。
-
-```bash
-npx tsc --noEmit
-npm run build
-```
-
-## 專案結構
-
-| 路徑 | 用途 |
-| --- | --- |
-| `components/board.tsx` | 多航班清單、歷史曲線、助手連線 |
-| `app/api/flights/` | 查詢清單及票價儲存 API |
-| `lib/flight-url.ts` | 指定航班的 Google Flights 連結 |
-| `lib/seed.json` | 實際查詢所得的初始歷史快照 |
-| `extension/` | 免費瀏覽器助手原始碼 |
-| `public/fare-bridge.zip` | 可安裝的助手壓縮檔 |
-| `db/`、`drizzle/` | D1 schema 與 migration |
-
-網站使用 React、Vinext、Cloudflare Workers／D1。這是完整網站原始碼，並非可直接丟到 GitHub Pages 的純靜態 HTML；目前正式網站使用上方網址。移轉到其他網域時，須同步修改 `extension/manifest.json`、`extension/background.js` 的網站允許清單並重新打包助手。
-
-## 驗證狀態
-
-已通過 TypeScript 檢查、正式建置、兩筆實際 Google Flights 畫面的歷史解析、錯誤航班拒收、儲存失敗處理，以及擴充套件佇列模擬。Chrome／Edge 安裝後的完整更新流程仍需在使用者瀏覽器確認。
-
-原始 starter 的開發說明保留於 `docs/STARTER-DEVELOPMENT.md`。第三方元件授權檔保留在原目錄。
+修改後重新建置，將原始碼和 `docs/` 一起提交。Pages 設定為 `main /docs` 後，GitHub 會自動發布更新。`docs/` 是產出檔，請修改 `src/`、`index.html`、`extension/` 再建置。
